@@ -80,3 +80,16 @@ class PacketService:
             send(packet)
         except Exception as e:
             self.logger_service.log_error(f"Error sending packet: {e}")
+
+
+def checksum(data):
+    if len(data) % 2 == 1:
+        data += b'\0'
+
+    data = data[:10] + b'\x00\x00' + data[12:]  # Zero out checksum field
+    unpacked_data = struct.unpack('!%sH' % (len(data) // 2), data)
+    s = sum(unpacked_data)
+    s = (s >> 16) + (s & 0xFFFF)
+    s += (s >> 16)
+
+    return ~s & 0xFFFF
