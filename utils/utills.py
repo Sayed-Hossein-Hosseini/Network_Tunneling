@@ -53,3 +53,30 @@ class LoggerService:
 
     def log_debug(self, message):
         self.logger.debug(message)
+
+
+class PacketService:
+    def __init__(self, logger_service):
+        self.logger_service = logger_service
+
+    @staticmethod
+    def create_outer_packet(src_ip, dst_ip, ttl, file_data, identifier, more_chunk, seq_number):
+        inner_packet = PacketHandler.create_packet(src_ip, dst_ip, ttl, file_data, identifier, more_chunk,
+                                                   seq_number)
+        outer_packet_data = inner_packet
+        return PacketHandler.create_packet(src_ip, dst_ip, ttl, outer_packet_data, identifier, 0, 0)
+
+    def validate_checksum(self, packet, raw_ip_header):
+        calculated_checksum = checksum(raw_ip_header)
+        if int(calculated_checksum) != int(packet[IP].chksum):
+            self.logger_service.log_error(f"Checksum mismatch: {packet[IP].chksum} != {calculated_checksum}")
+            return False
+        return True
+
+
+
+    def send_packet(self, packet):
+        try:
+            send(packet)
+        except Exception as e:
+            self.logger_service.log_error(f"Error sending packet: {e}")
