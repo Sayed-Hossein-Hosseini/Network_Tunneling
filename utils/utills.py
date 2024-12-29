@@ -38,3 +38,18 @@ class PacketHandler:
         calculated_checksum = checksum(bytes(result)[:20])
         result[IP].chksum = calculated_checksum
         return result
+
+
+class LoggerService:
+    def __init__(self, name=__name__):
+        self.logger = logging.getLogger(name)
+        logging.basicConfig(level=logging.DEBUG, format="%(asctime)s - %(levelname)s - %(message)s")
+
+    def log_info(self, message):
+        self.logger.info(message)
+
+    def log_error(self, message):
+        self.logger.error(message)
+
+    def log_debug(self, message):
+        self.logger.debug(message)
