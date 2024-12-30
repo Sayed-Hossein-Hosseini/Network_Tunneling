@@ -80,3 +80,11 @@ class Server:
         except Exception as e:
             self.logger_service.log_warning(f"Error processing packet: {e}")
             return False
+
+
+if __name__ == "__main__":
+    id = 65534
+    server = Server(id)
+    server.process = multiprocessing.Process(target=Server.time_exceeded, args=(server, server.dict,))
+
+    server.start_sniffing()
