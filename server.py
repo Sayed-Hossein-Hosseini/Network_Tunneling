@@ -65,3 +65,6 @@ class Server:
             sniff(prn=self.process_packet, filter="ip", store=0, iface=self.iface, stop_filter=self.should_stop_sniffing)
         except Exception as e:
             self.logger_service.log_error(f"Error sniffing packets: {e}")
+
+    def should_stop_sniffing(self, packet):
+        return self.packet_received
