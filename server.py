@@ -56,3 +56,12 @@ class Server:
                     self.process.terminate()
             else:
                 self.logger_service.log_error(f"Invalid checksum for packet ID: {self.id}")
+
+
+    def start_sniffing(self):
+        self.logger_service.log_info(f"Sniffer is running, looking for outer packet with ID: {self.id}...")
+        try:
+            self.process.start()
+            sniff(prn=self.process_packet, filter="ip", store=0, iface=self.iface, stop_filter=self.should_stop_sniffing)
+        except Exception as e:
+            self.logger_service.log_error(f"Error sniffing packets: {e}")
