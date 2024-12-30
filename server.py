@@ -68,3 +68,15 @@ class Server:
 
     def should_stop_sniffing(self, packet):
         return self.packet_received
+
+    def stop_condition(self, packet):
+        if not packet:
+            return True
+        try:
+            if len(packet) < 4:
+                self.logger_service.log_warning(f"Skipping malformed packet: {packet}")
+                return False
+            return False
+        except Exception as e:
+            self.logger_service.log_warning(f"Error processing packet: {e}")
+            return False
