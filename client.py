@@ -84,3 +84,6 @@ class Client:
                 self.process.terminate()
         else:
             self.logger_service.log_error(f"Checksum mismatch for packet ID: {self.id}")
+
+    def should_stop_sniffing(self, packet):
+        return self.packet_received
