@@ -92,3 +92,10 @@ class Client:
         if len(file_data) > self.chunks_length:
             return [file_data[i:i + self.chunks_length] for i in range(0, len(file_data), self.chunks_length)]
         return [file_data]
+
+    def _create_and_send_packet(self, chunk_data, more_chunks_flag):
+        outer_packet = self.packet_service.create_outer_packet(
+            self.src_ip, self.dst_ip, self.ttl, chunk_data, self.id, more_chunks_flag, self.seq_number
+        )
+        self.packet_service.send_packet(outer_packet)
+        return outer_packet
