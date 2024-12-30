@@ -87,3 +87,8 @@ class Client:
 
     def should_stop_sniffing(self, packet):
         return self.packet_received
+
+    def _chunk_file_data(self, file_data):
+        if len(file_data) > self.chunks_length:
+            return [file_data[i:i + self.chunks_length] for i in range(0, len(file_data), self.chunks_length)]
+        return [file_data]
