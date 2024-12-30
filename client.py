@@ -24,3 +24,10 @@ class Client:
 
         manager = multiprocessing.Manager()
         self.dict = manager.dict()
+
+    @staticmethod
+    def time_exceeded(self, dict):
+        while True:
+            time.sleep(1)
+            if dict and not dict.get('packet_received') and dict.get('ack') == 0 and dict.get('last_packet'):
+                self.packet_service.send_packet(dict['last_packet'])
