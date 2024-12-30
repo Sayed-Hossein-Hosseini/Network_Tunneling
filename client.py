@@ -54,3 +54,33 @@ class Client:
     def get_inner_packet(self, packet):
         if packet.haslayer(IP) and packet[IP].id == 65534:
             self._process_received_packet(packet)
+
+    def _process_received_packet(self, packet):
+        self.dict['ack'] = 1
+        self.seq_number += 1
+        self.chunk_number += 1
+
+        ip_header = packet[IP]
+        raw_ip_header = bytes(ip_header)[:20]
+
+        outer_packet = None
+        if self.packet_service.validate_checksum(packet, raw_ip_header):
+            custom_layer = CustomLayer(ip_header.load)
+            inner_packet = custom_layer.load
+
+            self.logger_service.log_info(f"Retrieved packet: {inner_packet}")
+
+            if self.chunk_number < len(self.chunks) - 1:
+                outer_packet = self._create_and_send_packet(self.chunks[self.chunk_number], 1)
+            elif self.chunk_number == len(self.chunks) - 1:
+                outer_packet = self._create_and_send_packet(self.chunks[self.chunk_number], 0)
+
+            self.dict['last_packet'] = outer_packet
+            self.dict['ack'] = 0
+
+            if custom_layer.more_chunk == 0:
+                self.packet_received = True
+                self.dict['packet_received'] = True
+                self.process.terminate()
+        else:
+            self.logger_service.log_error(f"Checksum mismatch for packet ID: {self.id}")
