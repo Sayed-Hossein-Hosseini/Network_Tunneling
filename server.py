@@ -30,3 +30,29 @@ class Server:
             time.sleep(1)
             if dict and not dict.get('packet_received') and dict.get('ack') == 0 and dict.get('last_packet'):
                 self.packet_service.send_packet(dict['last_packet'])
+
+
+    def process_packet(self, packet):
+        if packet.haslayer(IP) and packet[IP].id == 65535:
+            outer_packet = packet[IP]
+            raw_ip_header = bytes(outer_packet)[:20]
+
+            if self.packet_service.validate_checksum(packet, raw_ip_header):
+                inner_packet = outer_packet[IP][1]
+                custom_layer_raw_data = inner_packet.load
+                custom_layer = CustomLayer(custom_layer_raw_data)
+                if self.seq_number == custom_layer.seq_number:
+                    packet = PacketHandler.create_packet(self.src_ip, self.dst_ip, 64, custom_layer.load, self.id, custom_layer.more_chunk, self.seq_number)
+
+                    custom_layer.show()
+                    self.packet_service.send_packet(packet)
+                    self.dict['last_packet'] = packet
+                    self.dict['ack'] = 0
+                    self.seq_number += 1
+
+                if custom_layer.more_chunk == 0:
+                    self.packet_received = True
+                    self.dict['packet_received'] = True
+                    self.process.terminate()
+            else:
+                self.logger_service.log_error(f"Invalid checksum for packet ID: {self.id}")
