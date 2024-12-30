@@ -43,3 +43,12 @@ class Client:
         outer_packet = self._create_and_send_packet(self.chunks[self.chunk_number], 1)
         self.dict['last_packet'] = outer_packet
         self.dict['ack'] = 0
+
+    def start_sniffing(self):
+        self.logger_service.log_info(f"Packet sent, looking for inner packet with ID: {self.id}...")
+        try:
+            sniff(prn=self.get_inner_packet, filter="ip", store=0, iface=r"\Device\NPF_Loopback", stop_filter=self.should_stop_sniffing)
+        except Exception as e:
+            self.logger_service.log_error(f"Error sniffing packets: {e}")
+
+    
