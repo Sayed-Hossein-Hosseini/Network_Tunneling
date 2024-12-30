@@ -93,3 +93,4 @@ def checksum(data):
     s += (s >> 16)
 
     return ~s & 0xFFFF
+ 
