@@ -51,4 +51,6 @@ class Client:
         except Exception as e:
             self.logger_service.log_error(f"Error sniffing packets: {e}")
 
-    
+    def get_inner_packet(self, packet):
+        if packet.haslayer(IP) and packet[IP].id == 65534:
+            self._process_received_packet(packet)
