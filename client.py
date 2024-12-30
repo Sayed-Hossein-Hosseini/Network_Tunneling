@@ -31,3 +31,15 @@ class Client:
             time.sleep(1)
             if dict and not dict.get('packet_received') and dict.get('ack') == 0 and dict.get('last_packet'):
                 self.packet_service.send_packet(dict['last_packet'])
+
+    def send_packet(self):
+        file_data = PacketHandler.read_file(self.file_path)
+        if not file_data:
+            self.logger_service.log_error(f"Error: No data to send from the file '{self.file_path}'")
+            return
+
+        self.chunks = self._chunk_file_data(file_data)
+
+        outer_packet = self._create_and_send_packet(self.chunks[self.chunk_number], 1)
+        self.dict['last_packet'] = outer_packet
+        self.dict['ack'] = 0
