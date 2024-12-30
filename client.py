@@ -99,3 +99,13 @@ class Client:
         )
         self.packet_service.send_packet(outer_packet)
         return outer_packet
+
+if __name__ == "__main__":
+    file_path = "sample.txt"
+    id = 65535
+
+    client = Client(file_path, id)
+    client.process = multiprocessing.Process(target=Client.time_exceeded, args=(client, client.dict,))
+    client.send_packet()
+    client.process.start()
+    client.start_sniffing()
