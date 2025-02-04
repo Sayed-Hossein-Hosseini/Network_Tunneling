@@ -227,3 +227,16 @@ if __name__ == "__main__":
 ## Conclusion
 
 This project demonstrates a custom packet transmission system with features like chunked file transfer, checksum validation, and retransmission. It is a robust solution for sending and receiving data over a network using a custom protocol layer. The use of Scapy and multiprocessing makes it efficient and scalable for various use cases.
+
+---
+
+## License  
+
+This project is licensed under the MIT License. See the [LICENSE](LICENSE) file for more details.  
+
+---
+
+## Authors  
+
+- Sayyed Hossein Hosseini DolatAbadi
+- Mohammad Hossein Rangraz
